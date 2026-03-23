@@ -310,6 +310,27 @@ color: #193126;
 z-index: 1;
 }
 
+.tile-wrong-marker {
+display: none;
+position: absolute;
+top: 0.35rem;
+right: 0.35rem;
+width: 1.6rem;
+height: 1.6rem;
+border-radius: 999px;
+align-items: center;
+justify-content: center;
+font-size: 1rem;
+font-weight: 800;
+line-height: 1;
+color: #ffffff;
+background: rgba(209, 74, 58, 0.92);
+border: 2px solid rgba(255, 255, 255, 0.95);
+box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+z-index: 2;
+pointer-events: none;
+}
+
 .tile.fallback-active .tile-fallback {
 display: flex;
 }
@@ -339,6 +360,10 @@ box-shadow: 0 0 0 3px rgba(21, 154, 72, 0.24);
 .tile.wrong {
 border-color: var(--wrong-red);
 box-shadow: 0 0 0 3px rgba(209, 74, 58, 0.24);
+}
+
+.tile.wrong .tile-wrong-marker {
+display: inline-flex;
 }
 
 .actions {

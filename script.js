@@ -4,6 +4,7 @@
 const TIME_LIMIT = 60;
 const STARTING_SCORE = 100;
 const GRID_SIZE = 9;
+const SUCCESS_SOUND_PATH = "audio/foxboytails-game-start-317318.mp3";
 
 // Image paths from the local img folder.
 const images = [
@@ -32,6 +33,7 @@ const state = {
 };
 
 const elements = {};
+let successAudio = null;
 
 function initGame() {
 	elements.grid = document.getElementById("grid");
@@ -53,6 +55,10 @@ function initGame() {
 	elements.jerryWater = document.getElementById("jerryWater");
 	elements.challengePanel = document.querySelector(".panel-center");
 
+	// Preload the completion sound. If the file is missing, gameplay still works.
+	successAudio = new Audio(SUCCESS_SOUND_PATH);
+	successAudio.preload = "auto";
+
 	elements.startButton.addEventListener("click", () => {
 		startGame("normal");
 	});
@@ -69,6 +75,20 @@ function initGame() {
 	updateTimer();
 	updateScore(0);
 	showJerryCanAlert("Check both boxes, then start the challenge.", "info", 24);
+}
+
+function playSuccessSound() {
+	if (!successAudio) {
+		return;
+	}
+
+	successAudio.currentTime = 0;
+	const playPromise = successAudio.play();
+
+	// Ignore blocked autoplay or missing-file errors to avoid interrupting gameplay.
+	if (playPromise && typeof playPromise.catch === "function") {
+		playPromise.catch(() => {});
+	}
 }
 
 function startGame(difficulty = "normal") {
@@ -174,6 +194,12 @@ function generateGrid() {
 		tileFallback.className = "tile-fallback";
 		tileFallback.textContent = `${formatTypeLabel(tileData.type)}: ${tileData.label}`;
 
+		// This X marker appears only when a selected tile is incorrect after verification.
+		const wrongMarker = document.createElement("span");
+		wrongMarker.className = "tile-wrong-marker";
+		wrongMarker.setAttribute("aria-hidden", "true");
+		wrongMarker.textContent = "X";
+
 		// If a placeholder image is missing, show a text fallback instead of a broken icon.
 		tileImage.addEventListener("error", () => {
 			tileButton.classList.add("fallback-active");
@@ -182,6 +208,7 @@ function generateGrid() {
 
 		tileButton.appendChild(tileImage);
 		tileButton.appendChild(tileFallback);
+		tileButton.appendChild(wrongMarker);
 		tileButton.addEventListener("click", handleTileClick);
 		elements.grid.appendChild(tileButton);
 	});
@@ -320,6 +347,7 @@ function endGame(isSuccess, isTimeUp) {
 		elements.statusHeadline.textContent = "Verification Complete";
 		elements.statusMessage.textContent = "You may now use this service.";
 		elements.centerMessage.textContent = "Perfect selection. All clean water images were identified correctly.";
+		playSuccessSound();
 		showSuccessJerryAlert();
 		return;
 	}
