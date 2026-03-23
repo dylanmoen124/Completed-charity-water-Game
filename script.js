@@ -3,6 +3,7 @@
 
 const TIME_LIMIT = 60;
 const STARTING_SCORE = 100;
+const GRID_SIZE = 9;
 
 // Image paths from the local img folder.
 const images = [
@@ -25,6 +26,7 @@ const state = {
 	elapsedSeconds: 0,
 	timerIntervalId: null,
 	gameActive: false,
+	difficulty: "normal",
 	currentTiles: [],
 	selectedTileIndexes: new Set()
 };
@@ -34,6 +36,7 @@ const elements = {};
 function initGame() {
 	elements.grid = document.getElementById("grid");
 	elements.startButton = document.getElementById("startButton");
+	elements.harderButton = document.getElementById("harderButton");
 	elements.verifyButton = document.getElementById("verifyButton");
 	elements.reloadButton = document.getElementById("reloadButton");
 	elements.timerDisplay = document.getElementById("timerDisplay");
@@ -50,7 +53,12 @@ function initGame() {
 	elements.jerryWater = document.getElementById("jerryWater");
 	elements.challengePanel = document.querySelector(".panel-center");
 
-	elements.startButton.addEventListener("click", startGame);
+	elements.startButton.addEventListener("click", () => {
+		startGame("normal");
+	});
+	elements.harderButton.addEventListener("click", () => {
+		startGame("hard");
+	});
 	elements.verifyButton.addEventListener("click", validateSelection);
 	elements.reloadButton.addEventListener("click", generateGrid);
 	elements.awarenessCheck.addEventListener("change", updateChecklistIcons);
@@ -63,7 +71,7 @@ function initGame() {
 	showJerryCanAlert("Check both boxes, then start the challenge.", "info", 24);
 }
 
-function startGame() {
+function startGame(difficulty = "normal") {
 	if (state.timerIntervalId) {
 		clearInterval(state.timerIntervalId);
 	}
@@ -71,14 +79,25 @@ function startGame() {
 	state.score = STARTING_SCORE;
 	state.elapsedSeconds = 0;
 	state.gameActive = true;
+	state.difficulty = difficulty === "hard" ? "hard" : "normal";
 	state.selectedTileIndexes.clear();
 	elements.appContainer.classList.add("active");
 	elements.verifyButton.disabled = false;
 	elements.reloadButton.disabled = false;
-	elements.centerMessage.textContent = "Challenge started. Select all clean water images, then press Verify.";
-	elements.statusHeadline.textContent = "In progress";
-	elements.statusMessage.textContent = "Find every clean image and avoid dirty or unrelated images.";
-	showJerryCanAlert("Jerry can filled. Challenge started.", "success", 70);
+	elements.startButton.textContent = "Restart Normal";
+	hideHarderButton();
+
+	if (state.difficulty === "hard") {
+		elements.centerMessage.textContent = "Hard mode started. Score drops faster and there are fewer clean images.";
+		elements.statusHeadline.textContent = "In progress (Hard)";
+		elements.statusMessage.textContent = "Find every clean image quickly. Hard mode drains score twice as fast.";
+		showJerryCanAlert("Hard mode active. Stay sharp.", "warning", 70);
+	} else {
+		elements.centerMessage.textContent = "Challenge started. Select all clean water images, then press Verify.";
+		elements.statusHeadline.textContent = "In progress";
+		elements.statusMessage.textContent = "Find every clean image and avoid dirty or unrelated images.";
+		showJerryCanAlert("Jerry can filled. Challenge started.", "success", 70);
+	}
 	scrollToChallengePanel();
 
 	generateGrid();
@@ -125,10 +144,10 @@ function generateGrid() {
 	const dirtyPool = images.filter((image) => image.type === "dirty");
 	const neutralPool = images.filter((image) => image.type === "neutral");
 
-	// Ensure each round has clean, dirty, and neutral options.
-	const cleanCount = 3;
+	// Hard mode uses one fewer clean image in the 3x3 grid.
+	const cleanCount = state.difficulty === "hard" ? 2 : 3;
 	const dirtyCount = 3;
-	const neutralCount = 3;
+	const neutralCount = GRID_SIZE - cleanCount - dirtyCount;
 
 	const roundTiles = [
 		...pickRandomItems(cleanPool, cleanCount),
@@ -166,6 +185,12 @@ function generateGrid() {
 		tileButton.addEventListener("click", handleTileClick);
 		elements.grid.appendChild(tileButton);
 	});
+
+	if (state.difficulty === "hard") {
+		elements.centerMessage.textContent = "Hard mode grid loaded. Fewer clean images are available.";
+		showJerryCanAlert("Hard grid ready. Clean water is rarer.", "warning", 32);
+		return;
+	}
 
 	elements.centerMessage.textContent = "New grid loaded. Select all clean water images.";
 	showJerryCanAlert("Find all the clean water.", "info", 35);
@@ -239,7 +264,13 @@ function validateSelection() {
 }
 
 function updateScore(pointsDelta) {
-	state.score = Math.max(0, state.score + pointsDelta);
+	let adjustedDelta = pointsDelta;
+
+	if (state.difficulty === "hard" && pointsDelta < 0) {
+		adjustedDelta = pointsDelta * 2;
+	}
+
+	state.score = Math.max(0, state.score + adjustedDelta);
 	elements.scoreDisplay.textContent = String(state.score);
 
 	if (state.score <= 0 && state.gameActive) {
@@ -283,6 +314,7 @@ function endGame(isSuccess, isTimeUp) {
 	elements.verifyButton.disabled = true;
 	elements.reloadButton.disabled = true;
 	elements.startButton.textContent = "Play Again";
+	showHarderButton();
 
 	if (isSuccess) {
 		elements.statusHeadline.textContent = "Verification Complete";
@@ -304,6 +336,18 @@ function endGame(isSuccess, isTimeUp) {
 	elements.statusMessage.textContent = "Score reached zero. Press Play Again to start a fresh challenge.";
 	elements.centerMessage.textContent = "Challenge ended because the score dropped to zero.";
 	showJerryCanAlert("Score reached zero. Try a fresh round.", "error", 8);
+}
+
+function showHarderButton() {
+	elements.harderButton.classList.remove("is-hidden");
+	elements.harderButton.setAttribute("aria-hidden", "false");
+	elements.harderButton.removeAttribute("tabindex");
+}
+
+function hideHarderButton() {
+	elements.harderButton.classList.add("is-hidden");
+	elements.harderButton.setAttribute("aria-hidden", "true");
+	elements.harderButton.setAttribute("tabindex", "-1");
 }
 
 function pickRandomItems(pool, count) {

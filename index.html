@@ -8,26 +8,6 @@
 </head>
 <body>
     <div class="app-container">
-        <section class="panel panel-left" aria-labelledby="left-title">
-            <h1 id="left-title">The Water CAPTCHA</h1>
-
-            <div class="checklist" aria-label="Verification checklist">
-                <label class="check-item">
-                    <input type="checkbox" id="awarenessCheck">
-                    <span>Verify you understand clean water access</span>
-                    <span id="awarenessStatusIcon" class="status-icon status-icon-x" aria-hidden="true">✕</span>
-                </label>
-                <label class="check-item">
-                    <input type="checkbox" id="robotCheck">
-                    <span>I am not a robot</span>
-                    <span id="robotStatusIcon" class="status-icon status-icon-x" aria-hidden="true">✕</span>
-                </label>
-            </div>
-
-            <button id="startButton" class="btn btn-primary" type="button">Start Challenge</button>
-            <p class="tiny-note">Single-player mode. Each challenge uses a randomized 3x3 grid.</p>
-        </section>
-
         <main class="app" aria-label="Water CAPTCHA game">
             <section class="panel panel-center" aria-labelledby="challenge-title">
                 <h2 id="challenge-title">Select all images with clean water</h2>
@@ -57,6 +37,27 @@
                 </footer>
             </section>
         </main>
+
+        <section class="panel panel-left" aria-labelledby="left-title">
+            <h1 id="left-title">The Water CAPTCHA</h1>
+
+            <div class="checklist" aria-label="Verification checklist">
+                <label class="check-item">
+                    <input type="checkbox" id="awarenessCheck">
+                    <span>Verify you understand clean water access</span>
+                    <span id="awarenessStatusIcon" class="status-icon status-icon-x" aria-hidden="true">✕</span>
+                </label>
+                <label class="check-item">
+                    <input type="checkbox" id="robotCheck">
+                    <span>I am not a robot</span>
+                    <span id="robotStatusIcon" class="status-icon status-icon-x" aria-hidden="true">✕</span>
+                </label>
+            </div>
+
+            <button id="startButton" class="btn btn-primary" type="button">Start Challenge</button>
+            <button id="harderButton" class="btn btn-secondary mode-button is-hidden" type="button" aria-hidden="true" tabindex="-1">Harder Challenge?</button>
+            <p class="tiny-note">Single-player mode. Each challenge uses a randomized 3x3 grid.</p>
+        </section>
     </div>
 
     <section id="jerryAlert" class="jerry-alert" role="status" aria-live="polite" aria-hidden="true">
