@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Water CAPTCHA</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <section class="panel panel-left" aria-labelledby="left-title">
+            <h1 id="left-title">The Water CAPTCHA</h1>
+
+            <div class="checklist" aria-label="Verification checklist">
+                <label class="check-item">
+                    <input type="checkbox" id="awarenessCheck">
+                    <span>Verify you understand clean water access</span>
+                    <span id="awarenessStatusIcon" class="status-icon status-icon-x" aria-hidden="true">✕</span>
+                </label>
+                <label class="check-item">
+                    <input type="checkbox" id="robotCheck">
+                    <span>I am not a robot</span>
+                    <span id="robotStatusIcon" class="status-icon status-icon-x" aria-hidden="true">✕</span>
+                </label>
+            </div>
+
+            <button id="startButton" class="btn btn-primary" type="button">Start Challenge</button>
+            <p class="tiny-note">Single-player mode. Each challenge uses a randomized 3x3 grid.</p>
+        </section>
+
+        <main class="app" aria-label="Water CAPTCHA game">
+            <section class="panel panel-center" aria-labelledby="challenge-title">
+                <h2 id="challenge-title">Select all images with clean water</h2>
+
+                <div class="hud" aria-live="polite">
+                    <p class="hud-item">Timer: <strong id="timerDisplay">00:00</strong></p>
+                    <p class="hud-item">Score: <strong id="scoreDisplay">100</strong></p>
+                </div>
+
+                <div id="grid" class="grid" role="grid" aria-label="Water image challenge"></div>
+
+                <div class="actions">
+                    <button id="verifyButton" class="btn" type="button" disabled>Verify</button>
+                    <button id="reloadButton" class="btn btn-secondary" type="button" disabled>Reload Grid</button>
+                </div>
+
+                <p id="centerMessage" class="center-message" aria-live="polite">
+                    Press Start Challenge to begin.
+                </p>
+
+                <footer class="challenge-footer" aria-labelledby="result-title">
+                    <h3 id="result-title">Verification Status</h3>
+                    <p id="statusHeadline" class="status-headline">Awaiting challenge...</p>
+                    <p id="statusMessage" class="status-message">Complete the center challenge to verify your response.</p>
+                    <img src="img/water_icon.png" alt="Water icon" class="water-icon">
+                    <a href="#" class="charity-link">Learn more about Water Charity</a>
+                </footer>
+            </section>
+        </main>
+    </div>
+
+    <section id="jerryAlert" class="jerry-alert" role="status" aria-live="polite" aria-hidden="true">
+        <div class="jerry-can" aria-hidden="true">
+            <div class="jerry-cap"></div>
+            <div id="jerryWater" class="jerry-water"></div>
+            <div class="jerry-wave"></div>
+        </div>
+        <p id="jerryAlertText" class="jerry-alert-text">Ready</p>
+    </section>
+
+    <script src="script.js"></script>
+</body>
+</html>
